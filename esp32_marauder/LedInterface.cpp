@@ -17,7 +17,7 @@ void LedInterface::RunSetup() {
   this->initTime = millis();
 }
 
-void LedInterface::main(uint32_t currentTime) {
+void LedInterface::main(/*uint32_t currentTime*/) {
   if ((!settings_obj.loadSetting<bool>("EnableLED")) ||
       (this->current_mode == MODE_OFF)) {
     this->ledOff();

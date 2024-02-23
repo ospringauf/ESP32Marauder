@@ -87,6 +87,11 @@ void EvilPortal::setHtmlFromSerial() {
 }
 
 bool EvilPortal::setHtml() {
+  #ifndef HAS_SD
+    Serial.println("SD not supported");
+    return false;
+  #endif
+
   if (this->using_serial_html) {
     Serial.println("html previously set");
     return true;
@@ -127,6 +132,11 @@ bool EvilPortal::setHtml() {
 }
 
 bool EvilPortal::setAP(LinkedList<ssid>* ssids, LinkedList<AccessPoint>* access_points) {
+  #ifndef HAS_SD
+    Serial.println("SD not supported");
+    return false;
+  #endif
+
   // See if there are selected APs first
   String ap_config = "";
   String temp_ap_name = "";

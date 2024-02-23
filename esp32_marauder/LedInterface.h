@@ -41,7 +41,7 @@ class LedInterface {
     LedInterface();
 
     void RunSetup();
-    void main(uint32_t currentTime);
+    void main(/*uint32_t currentTime*/);
 
     void setMode(uint8_t);
     void setColor(int r, int g, int b);

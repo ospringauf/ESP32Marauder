@@ -8,7 +8,7 @@
 
   //// BOARD TARGETS
   //#define MARAUDER_M5STICKC
-  #define MARAUDER_MINI
+  //#define MARAUDER_MINI
   //#define MARAUDER_V4
   //#define MARAUDER_V6
   //#define MARAUDER_V6_1
@@ -18,6 +18,7 @@
   //#define ESP32_LDDB
   //#define MARAUDER_DEV_BOARD_PRO
   //#define XIAO_ESP32_S3
+  #define ESP32_S2_MINI
   //// END BOARD TARGETS
 
   #define MARAUDER_VERSION "v0.13.8"
@@ -133,6 +134,13 @@
     //#define HAS_TEMP_SENSOR
     //#define HAS_GPS
   #endif
+
+  #ifdef ESP32_S2_MINI
+    // Arduino IDE: Use boad "ESP32S2 Dev" and "minimal SPIFF"
+    // documentation and pinout: https://www.wemos.cc/en/latest/s2/s2_mini.html
+    #define S2_MINI_TX0 12
+    #define S2_MINI_RX0 11
+  #endif 
 
   #ifdef MARAUDER_FLIPPER
     //#define FLIPPER_ZERO_HAT
@@ -740,6 +748,8 @@
     #define MEM_LOWER_LIM 20000
   #elif defined(XIAO_ESP32_S3)
     #define MEM_LOWER_LIM 20000
+  #else
+    #define MEM_LOWER_LIM 20000    
   #endif
   //// END MEMORY LOWER LIMIT STUFF
 

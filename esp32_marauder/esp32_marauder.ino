@@ -23,6 +23,7 @@ https://www.online-utility.org/image/convert/to/XBM
 #include "freertos/task.h"
 #include "esp_system.h"
 #include <Arduino.h>
+#include "LedWrapper.h"
 
 #ifdef HAS_GPS
   #include "GpsInterface.h"
@@ -35,15 +36,6 @@ https://www.online-utility.org/image/convert/to/XBM
 #endif
 #include "Buffer.h"
 
-#ifdef MARAUDER_FLIPPER
-  #include "flipperLED.h"
-#elif defined(XIAO_ESP32_S3)
-  #include "xiaoLED.h"
-#elif defined(MARAUDER_M5STICKC)
-  #include "stickcLED.h"
-#else
-  #include "LedInterface.h"
-#endif
 
 //#include "esp_interface.h"
 #include "settings.h"
@@ -85,6 +77,7 @@ https://www.online-utility.org/image/convert/to/XBM
 
 #endif
 
+LedWrapper the_led;
 WiFiScan wifi_scan_obj;
 EvilPortal evil_portal_obj;
 //Web web_obj;
@@ -119,21 +112,8 @@ CommandLine cli_obj;
   AXP192 axp192_obj;
 #endif
 
-#ifdef MARAUDER_FLIPPER
-  flipperLED flipper_led;
-#elif defined(XIAO_ESP32_S3)
-  xiaoLED xiao_led;
-#elif defined(MARAUDER_M5STICKC)
-  stickcLED stickc_led;
-#else
-  LedInterface led_obj;
-#endif
 
 const String PROGMEM version_number = MARAUDER_VERSION;
-
-#ifdef HAS_NEOPIXEL_LED
-  Adafruit_NeoPixel strip = Adafruit_NeoPixel(Pixels, PIN, NEO_GRB + NEO_KHZ800);
-#endif
 
 uint32_t currentTime  = 0;
 
@@ -196,7 +176,28 @@ void setup()
     delay(10);
   #endif
 
-  Serial.begin(115200);
+  #ifdef ESP32_S2_MINI
+    #if ARDUINO_USB_CDC_ON_BOOT == 0
+    Serial.begin(115200,SERIAL_8N1,S2_MINI_TX0,S2_MINI_RX0);
+    #else
+    Serial.begin(115200);
+    #endif
+  #else
+    Serial.begin(115200);
+  #endif
+
+  // Starts a second serial channel to stream the captured packets
+  #ifdef WRITE_PACKETS_SERIAL
+    
+    #ifdef XIAO_ESP32_S3
+      Serial1.begin(115200, SERIAL_8N1, XIAO_RX1, XIAO_TX1);
+    #elif defined(ESP32_S2_MINI)
+      Serial1.begin(115200,SERIAL_8N1, S2_MINI_TX1, S2_MINI_RX1);
+    #else
+      Serial1.begin(115200);
+    #endif
+    
+  #endif
 
   //Serial.println("\n\nHello, World!\n");
 
@@ -328,16 +329,7 @@ void setup()
 //      Serial.println(F("IP5306 I2C Supported: false"));
   #endif
 
-  // Do some LED stuff
-  #ifdef MARAUDER_FLIPPER
-    flipper_led.RunSetup();
-  #elif defined(XIAO_ESP32_S3)
-    xiao_led.RunSetup();
-  #elif defined(MARAUDER_M5STICKC)
-    stickc_led.RunSetup();
-  #else
-    led_obj.RunSetup();
-  #endif
+  the_led.RunSetup();
 
   #ifdef HAS_SCREEN
     display_obj.tft.println(F(text_table0[7]));
@@ -443,15 +435,7 @@ void loop()
     #endif
     //cli_obj.main(currentTime);
   }
-  #ifdef MARAUDER_FLIPPER
-    flipper_led.main();
-  #elif defined(XIAO_ESP32_S3)
-    xiao_led.main();
-  #elif defined(MARAUDER_M5STICKC)
-    stickc_led.main();
-  #else
-    led_obj.main(currentTime);
-  #endif
+  the_led.main();
 
   //if (wifi_scan_obj.currentScanMode == OTA_UPDATE)
   //  web_obj.main();
